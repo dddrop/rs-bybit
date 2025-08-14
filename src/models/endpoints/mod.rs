@@ -1,0 +1,15 @@
+pub mod amend_order;
+pub mod batch_cancel_orders;
+pub mod cancel_all_orders;
+pub mod cancel_order;
+pub mod instruments_info;
+pub mod inter_transfer;
+pub mod kline;
+pub mod open_and_closed_orders;
+pub mod place_order;
+pub mod position_info;
+pub mod server_time;
+pub mod set_leverage;
+pub mod trading_history;
+pub mod trading_stop;
+pub mod wallet_balance;
