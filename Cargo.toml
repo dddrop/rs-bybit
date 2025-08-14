@@ -15,5 +15,10 @@ serde_json = "1.0.142"
 sha2 = "0.10.9"
 tokio = { version = "1.47.1", features = ["sync", "tracing"] }
 tokio-tungstenite = "0.27.0"
-tracing = "0.1.41"
-tracing-subscriber = "0.3.19"
+tracing = { version = "0.1.41", optional = true }
+
+[features]
+
+default = []
+
+logging = ["tracing"]

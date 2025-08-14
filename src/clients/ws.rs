@@ -25,8 +25,11 @@ pub(crate) struct WebSocket {
 impl WebSocket {
     pub async fn new(credentials: Option<Arc<Credentials>>) -> Self {
         match connect_async(PRIVATE_URL).await {
-            Ok((stream, response)) => {
-                tracing::info!("[INF-B5CQOTLD][WS] Connected successfully: {:?}", response);
+            Ok((stream, _response)) => {
+                #[cfg(feature = "logging")]
+                {
+                    tracing::info!("[Bybit][WS] Connected successfully: {:?}", _response);
+                }
 
                 let (mut sink, mut stream) = stream.split();
 
@@ -40,27 +43,36 @@ impl WebSocket {
                                 tungstenite::Message::Text(text) => {
                                     match serde_json::from_str::<Message>(&text.to_string()) {
                                         Ok(msg) => {
-                                            if let Err(e) = recv_tx.send(msg).await {
-                                                tracing::error!(
-                                                    "[ERR-4XCGCOIP][WS] Failed to send to recv channel: {:?}",
-                                                    e
-                                                );
+                                            if let Err(_e) = recv_tx.send(msg).await {
+                                                #[cfg(feature = "logging")]
+                                                {
+                                                    tracing::error!(
+                                                        "[Bybit][WS] Failed to send to recv channel: {:?}",
+                                                        _e
+                                                    );
+                                                }
                                                 break;
                                             }
                                         }
-                                        Err(e) => {
-                                            tracing::error!(
-                                                "[ERR-4XCGCOIP][WS] Failed to deserialize WsMessage: {:?} (raw: {:?})",
-                                                e,
-                                                msg.to_string(),
-                                            );
+                                        Err(_e) => {
+                                            #[cfg(feature = "logging")]
+                                            {
+                                                tracing::error!(
+                                                    "[Bybit][WS] Failed to deserialize WsMessage: {:?} (raw: {:?})",
+                                                    _e,
+                                                    msg.to_string(),
+                                                );
+                                            }
                                         }
                                     }
                                 }
                                 _ => {}
                             },
-                            Err(e) => {
-                                tracing::error!("[ERR-4XCGCOIP][WS] Read failed: {:?}", e);
+                            Err(_e) => {
+                                #[cfg(feature = "logging")]
+                                {
+                                    tracing::error!("[Bybit][WS] Read failed: {:?}", _e);
+                                }
                                 break;
                             }
                         }
@@ -70,11 +82,14 @@ impl WebSocket {
                 tokio::spawn(async move {
                     while let Some(msg) = send_rx.recv().await {
                         let encoded_msg = serde_json::to_string(&msg).unwrap();
-                        if let Err(e) = sink
+                        if let Err(_e) = sink
                             .send(tungstenite::Message::Text(encoded_msg.into()))
                             .await
                         {
-                            tracing::error!("[ERR-4XCGCOIP][WS] Send failed: {:?}", e);
+                            #[cfg(feature = "logging")]
+                            {
+                                tracing::error!("[Bybit][WS] Send failed: {:?}", _e);
+                            }
                             break;
                         }
                     }
@@ -86,16 +101,22 @@ impl WebSocket {
                     tx: Arc::new(Mutex::new(send_tx)),
                 }
             }
-            Err(e) => {
-                tracing::error!("[ERR-BYNFQUAK][WS] Connection failed: {:?}", e);
+            Err(_e) => {
+                #[cfg(feature = "logging")]
+                {
+                    tracing::error!("[Bybit][WS] Connection failed: {:?}", _e);
+                }
                 panic!();
             }
         }
     }
 
     pub async fn send(&self, msg: Command) {
-        if let Err(e) = self.tx.lock().await.send(msg).await {
-            tracing::error!("[ERR-UVQZEYO0][WS] Send failed: {:?}", e);
+        if let Err(_e) = self.tx.lock().await.send(msg).await {
+            #[cfg(feature = "logging")]
+            {
+                tracing::error!("[Bybit][WS] Send failed: {:?}", _e);
+            }
         }
     }
 
@@ -163,7 +184,7 @@ impl WebSocket {
             let mut interval = interval(Duration::from_secs(20));
             loop {
                 interval.tick().await;
-                if let Err(e) = ws_ping
+                if let Err(_e) = ws_ping
                     .lock()
                     .await
                     .send(Command {
@@ -172,7 +193,10 @@ impl WebSocket {
                     })
                     .await
                 {
-                    tracing::error!("[ERR-PING][WS] Ping failed: {:?}", e);
+                    #[cfg(feature = "logging")]
+                    {
+                        tracing::error!("[ERR-PING][WS] Ping failed: {:?}", _e);
+                    }
                     break;
                 }
             }
