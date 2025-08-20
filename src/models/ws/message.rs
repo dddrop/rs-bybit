@@ -2,6 +2,7 @@ use std::fmt::Display;
 
 use serde::{Deserialize, Deserializer, Serialize};
 
+use crate::models::ws::ws_kline_data::WSKlineData;
 use crate::models::{Execution, Order, Position, WalletBalance, ws::fast_execution::FastExecution};
 
 #[derive(Debug, Serialize, PartialEq)]
@@ -54,7 +55,11 @@ pub struct OperationMessage {
 #[serde(rename_all = "camelCase")]
 pub struct EventMessage {
     pub id: Option<String>,
-    pub creation_time: Option<u128>,
+    pub creation_time: Option<u64>,
+    #[serde(rename = "type")]
+    pub message_type: Option<String>,
+    pub ts: Option<u64>,
+    pub cs: Option<u64>,
     #[serde(flatten)]
     pub data: EventMessageData,
 }
@@ -102,6 +107,12 @@ impl<'de> Deserialize<'de> for EventMessage {
                     .ok_or_else(|| serde::de::Error::custom("missing data field"))?;
                 serde_json::from_value(data.clone()).map(EventMessageData::Position)
             }
+            kline if kline.starts_with("kline") => {
+                let data = map
+                    .get("data")
+                    .ok_or_else(|| serde::de::Error::custom("missing data field"))?;
+                serde_json::from_value(data.clone()).map(EventMessageData::Kline)
+            }
             _ => Err(serde::de::Error::custom(format!("unknown type: {}", topic))),
         };
 
@@ -111,10 +122,13 @@ impl<'de> Deserialize<'de> for EventMessage {
                     .get("id")
                     .and_then(|v| v.as_str())
                     .map(|s| s.to_string()),
-                creation_time: map
-                    .get("creationTime")
-                    .and_then(|v| v.as_u64())
-                    .map(|s| s as u128),
+                creation_time: map.get("creationTime").and_then(|v| v.as_u64()),
+                message_type: map
+                    .get("type")
+                    .and_then(|v| v.as_str())
+                    .map(|s| s.to_string()),
+                ts: map.get("ts").and_then(|v| v.as_u64()),
+                cs: map.get("cs").and_then(|v| v.as_u64()),
                 data,
             }),
             Err(e) => Err(serde::de::Error::custom(e)),
@@ -131,4 +145,5 @@ pub enum EventMessageData {
     Order(Vec<Order>),
     Position(Vec<Position>),
     Wallet(Vec<WalletBalance>),
+    Kline(Vec<WSKlineData>),
 }

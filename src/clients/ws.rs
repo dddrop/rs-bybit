@@ -15,6 +15,7 @@ use crate::models::{
 };
 
 const PRIVATE_URL: &str = "wss://stream.bybit.com/v5/private";
+const PUBLIC_LINEAR: &str = "wss://stream.bybit.com/v5/public/linear";
 
 pub(crate) struct WebSocket {
     credentials: Option<Arc<Credentials>>,
@@ -24,7 +25,13 @@ pub(crate) struct WebSocket {
 
 impl WebSocket {
     pub async fn new(credentials: Option<Arc<Credentials>>) -> Self {
-        match connect_async(PRIVATE_URL).await {
+        let url = if credentials.is_some() {
+            PRIVATE_URL
+        } else {
+            PUBLIC_LINEAR
+        };
+
+        match connect_async(url).await {
             Ok((stream, _response)) => {
                 #[cfg(feature = "logging")]
                 {
