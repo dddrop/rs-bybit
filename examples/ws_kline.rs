@@ -1,5 +1,7 @@
-use rs_bybit::client::BybitWebSocketPublic;
-use rs_bybit::models::{Message, TopicType};
+use rs_bybit::{
+    client::BybitWebSocketPublic,
+    models::{Message, TopicType},
+};
 
 #[tokio::main]
 async fn main() {

@@ -2,8 +2,10 @@ use std::fmt::Display;
 
 use serde::{Deserialize, Deserializer, Serialize};
 
-use crate::models::ws::ws_kline_data::WSKlineData;
-use crate::models::{Execution, Order, Position, WalletBalance, ws::fast_execution::FastExecution};
+use crate::models::{
+    Execution, Order, Position, WalletBalance,
+    ws::{fast_execution::FastExecution, ws_kline_data::WSKlineData},
+};
 
 #[derive(Debug, Serialize, PartialEq)]
 pub enum Message {
