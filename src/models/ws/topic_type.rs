@@ -10,6 +10,7 @@ pub enum TopicType {
     Order(Option<Category>),
     Wallet,
     Ticker(String),
+    Kline(String, String),
 }
 
 impl Serialize for TopicType {
@@ -44,6 +45,9 @@ impl Serialize for TopicType {
             },
             TopicType::Wallet => serializer.serialize_str("wallet"),
             TopicType::Ticker(symbol) => serializer.serialize_str(&format!("tickers.{}", symbol)),
+            TopicType::Kline(interval, symbol) => {
+                serializer.serialize_str(&format!("kline.{}.{}", interval, symbol))
+            }
         }
     }
 }
@@ -74,6 +78,7 @@ impl<'de> Deserialize<'de> for TopicType {
                     "order" => Ok(TopicType::Order(category.into())),
                     "execution.fast" => Ok(TopicType::FastExecution(category.into())),
                     "tickers" => Ok(TopicType::Ticker(parts[1].to_string())),
+                    "kline" => Ok(TopicType::Kline(parts[1].to_string(), parts[2].to_string())),
                     _ => Err(serde::de::Error::custom("invalid topic")),
                 }
             }
