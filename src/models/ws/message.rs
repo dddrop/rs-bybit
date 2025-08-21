@@ -110,10 +110,13 @@ impl<'de> Deserialize<'de> for EventMessage {
                 serde_json::from_value(data.clone()).map(EventMessageData::Position)
             }
             kline if kline.starts_with("kline") => {
+                let parts = kline.split(".").collect::<Vec<&str>>();
+                let symbol = *parts.last().unwrap();
                 let data = map
                     .get("data")
                     .ok_or_else(|| serde::de::Error::custom("missing data field"))?;
-                serde_json::from_value(data.clone()).map(EventMessageData::Kline)
+                serde_json::from_value(data.clone())
+                    .map(move |v| EventMessageData::Kline(symbol.to_string(), v))
             }
             _ => Err(serde::de::Error::custom(format!("unknown type: {}", topic))),
         };
@@ -147,5 +150,5 @@ pub enum EventMessageData {
     Order(Vec<Order>),
     Position(Vec<Position>),
     Wallet(Vec<WalletBalance>),
-    Kline(Vec<WSKlineData>),
+    Kline(String, Vec<WSKlineData>),
 }

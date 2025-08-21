@@ -1,3 +1,4 @@
+use rs_bybit::models::{EventMessage, EventMessageData};
 use rs_bybit::{
     client::BybitWebSocketPublic,
     models::{Message, TopicType},
@@ -17,7 +18,16 @@ async fn main() {
         println!("{:?}", message);
         match message {
             Message::Operation(o) => {}
-            Message::Event(_) => {}
+            Message::Event(e) => match e.data {
+                EventMessageData::Execution(_) => {}
+                EventMessageData::FastExecution(_) => {}
+                EventMessageData::Order(_) => {}
+                EventMessageData::Position(_) => {}
+                EventMessageData::Wallet(_) => {}
+                EventMessageData::Kline(s, k) => {
+                    println!("{}:{:?}", s, k.first().unwrap())
+                }
+            },
         }
     }
 }
