@@ -95,6 +95,12 @@ impl Display for PositionIdx {
     }
 }
 
+impl Display for PositionIdxInt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self.0)
+    }
+}
+
 // TEST
 
 #[cfg(test)]
@@ -179,5 +185,18 @@ mod tests {
         assert_eq!(PositionIdx::OneWay.to_string(), "OneWay");
         assert_eq!(PositionIdx::HedgeBuySide.to_string(), "HedgeBuySide");
         assert_eq!(PositionIdx::HedgeSellSide.to_string(), "HedgeSellSide");
+    }
+
+    #[test]
+    fn test_position_idx_int_display() {
+        assert_eq!(PositionIdxInt(PositionIdx::OneWay).to_string(), "OneWay");
+        assert_eq!(
+            PositionIdxInt(PositionIdx::HedgeBuySide).to_string(),
+            "HedgeBuySide"
+        );
+        assert_eq!(
+            PositionIdxInt(PositionIdx::HedgeSellSide).to_string(),
+            "HedgeSellSide"
+        );
     }
 }
