@@ -1,7 +1,6 @@
-use rs_bybit::models::{EventMessage, EventMessageData};
 use rs_bybit::{
     client::BybitWebSocketPublic,
-    models::{Message, TopicType},
+    models::{EventMessage, EventMessageData, Message, TopicType},
 };
 
 #[tokio::main]
