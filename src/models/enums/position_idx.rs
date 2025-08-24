@@ -2,6 +2,7 @@
 // Ref. https://bybit-exchange.github.io/docs/v5/enum#positionidx
 // *************************************************************************************************
 
+use std::fmt::Display;
 use serde::{
     Deserialize, Deserializer, Serialize, Serializer,
     de::{Error as DeError, Unexpected},
@@ -87,6 +88,12 @@ impl<'de> Deserialize<'de> for PositionIdxString {
     }
 }
 
+impl Display for PositionIdx {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
 // TEST
 
 #[cfg(test)]
@@ -164,5 +171,12 @@ mod tests {
 
         let result: Result<PositionIdxString, _> = serde_json::from_value(json!("invalid"));
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_position_idx_display() {
+        assert_eq!(PositionIdx::OneWay.to_string(), "OneWay");
+        assert_eq!(PositionIdx::HedgeBuySide.to_string(), "HedgeBuySide");
+        assert_eq!(PositionIdx::HedgeSellSide.to_string(), "HedgeSellSide");
     }
 }
