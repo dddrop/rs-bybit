@@ -36,6 +36,13 @@ impl PositionIdx {
     }
 }
 
+impl Display for PositionIdx {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+// MARK: PositionIdxInt
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct PositionIdxInt(pub PositionIdx);
 
@@ -62,6 +69,14 @@ impl<'de> Deserialize<'de> for PositionIdxInt {
     }
 }
 
+impl Display for PositionIdxInt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self.0)
+    }
+}
+
+
+// MARK: PositionIdxString
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct PositionIdxString(pub PositionIdx);
 
@@ -89,17 +104,6 @@ impl<'de> Deserialize<'de> for PositionIdxString {
     }
 }
 
-impl Display for PositionIdx {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self)
-    }
-}
-
-impl Display for PositionIdxInt {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self.0)
-    }
-}
 
 // TEST
 
