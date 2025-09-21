@@ -9,7 +9,7 @@ use serde::{
     de::{Error as DeError, Unexpected},
 };
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Default, Clone)]
 pub enum PositionIdx {
     #[default]
     OneWay,
@@ -43,7 +43,7 @@ impl Display for PositionIdx {
 }
 
 // MARK: PositionIdxInt
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[derive(Debug, PartialEq, Eq, Default, Clone)]
 pub struct PositionIdxInt(pub PositionIdx);
 
 impl Serialize for PositionIdxInt {
@@ -51,7 +51,7 @@ impl Serialize for PositionIdxInt {
     where
         S: Serializer,
     {
-        serializer.serialize_u8(self.0.to_u8())
+        serializer.serialize_u8(self.0.clone().to_u8())
     }
 }
 
@@ -77,7 +77,7 @@ impl Display for PositionIdxInt {
 
 
 // MARK: PositionIdxString
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[derive(Debug, PartialEq, Eq, Default, Clone)]
 pub struct PositionIdxString(pub PositionIdx);
 
 impl Serialize for PositionIdxString {
@@ -85,7 +85,7 @@ impl Serialize for PositionIdxString {
     where
         S: Serializer,
     {
-        serializer.serialize_str(&self.0.to_u8().to_string())
+        serializer.serialize_str(&self.0.clone().to_u8().to_string())
     }
 }
 
